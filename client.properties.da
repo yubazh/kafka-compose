@@ -1,0 +1,6 @@
+sasl.mechanism=PLAIN
+sasl.jaas.config=org.apache.kafka.common.security.plain.PlainLoginModule required username="da" password="111111";
+security.protocol=SASL_SSL
+ssl.truststore.location=/home/user/kafka/kafka-compose/truststore/kafka.truststore.jks
+ssl.truststore.password=supersecret
+ssl.endpoint.identification.algorithm=

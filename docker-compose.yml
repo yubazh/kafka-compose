@@ -1,0 +1,297 @@
+version: "3.5"
+
+services:
+  kafka-0:
+    container_name: kafka-0
+    hostname: kafka-0
+    image: docker.io/bitnami/kafka:3.7
+    ports:
+      - "29092:29092"
+      - "29095:9404"
+    restart: always
+    networks:
+      - kafka  
+    environment:
+      # KAFKA CLUSTER
+      - KAFKA_CFG_NODE_ID=0
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka-0:9093,1@kafka-1:9093,2@kafka-2:9093
+      - KAFKA_CFG_SUPER_USERS=User:sa
+      # LISTENERS
+      - KAFKA_CFG_LISTENERS=INTERNAL://:9091,EXTERNAL://:29092,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://:9091,EXTERNAL://192.168.0.188:29092
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:SASL_SSL,EXTERNAL:SASL_SSL,CONTROLLER:SASL_SSL
+      # BROKER SETTINGS
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_INTER_BROKER_USER=sa
+      - KAFKA_INTER_BROKER_PASSWORD=000000
+      - KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+      # CONTROLLER SETTINGS
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_SASL_MECHANISM_CONTROLLER_PROTOCOL=PLAIN
+      - KAFKA_CONTROLLER_USER=sa
+      - KAFKA_CONTROLLER_PASSWORD=000000
+      # CLIENT SETTINGS
+      - KAFKA_CLIENT_LISTENER_NAME=EXTERNAL
+      - KAFKA_CLIENT_USERS=sa,da,va
+      - KAFKA_CLIENT_PASSWORDS=000000,111111,222222
+      # ACL
+      - KAFKA_CFG_AUTHORIZER_CLASS_NAME=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      - KAFKA_CFG_ALLOW_EVERYONE_IF_NO_ACL_FOUND=false
+      # SSL
+      - KAFKA_CFG_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM=
+      - KAFKA_CERTIFICATE_PASSWORD=supersecret
+      - KAFKA_TLS_TYPE=JKS
+      # SASL
+      - KAFKA_CFG_SASL_ENABLED_MECHANISMS=PLAIN
+      # COMMON SETTINGS
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+      - EXTRA_ARGS=-javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent-0.19.0.jar=9404:/opt/jmx-exporter/kafka-3_0_0.yml
+    volumes:
+      - kafka_0_data:/bitnami/kafka
+      - ./jmx-exporter:/opt/jmx-exporter
+      - ./keystore/kafka-0.server.keystore.jks:/opt/bitnami/kafka/config/certs/kafka.keystore.jks:ro
+      - ./truststore/kafka.truststore.jks:/opt/bitnami/kafka/config/certs/kafka.truststore.jks:ro
+    healthcheck:
+      test: "bash -c 'printf \"\" > /dev/tcp/127.0.0.1/9091; exit $$?;'"
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  kafka-1:
+    container_name: kafka-1
+    hostname: kafka-1
+    image: docker.io/bitnami/kafka:3.7
+    ports:
+      - "29093:29093"
+      - "29096:9404"
+    restart: always
+    networks:
+      - kafka  
+    environment:
+      # KAFKA CLUSTER
+      - KAFKA_CFG_NODE_ID=1
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka-0:9093,1@kafka-1:9093,2@kafka-2:9093
+      - KAFKA_CFG_SUPER_USERS=User:sa
+      # LISTENERS
+      - KAFKA_CFG_LISTENERS=INTERNAL://:9091,EXTERNAL://:29093,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://:9091,EXTERNAL://192.168.0.188:29093   
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:SASL_SSL,EXTERNAL:SASL_SSL,CONTROLLER:SASL_SSL
+      # BROKER SETTINGS
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_INTER_BROKER_USER=sa
+      - KAFKA_INTER_BROKER_PASSWORD=000000
+      - KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+      # CONTROLLER SETTINGS
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_SASL_MECHANISM_CONTROLLER_PROTOCOL=PLAIN
+      - KAFKA_CONTROLLER_USER=sa
+      - KAFKA_CONTROLLER_PASSWORD=000000
+      # CLIENT SETTINGS
+      - KAFKA_CLIENT_LISTENER_NAME=EXTERNAL
+      - KAFKA_CLIENT_USERS=sa,da,va
+      - KAFKA_CLIENT_PASSWORDS=000000,111111,222222
+      # ACL
+      - KAFKA_CFG_AUTHORIZER_CLASS_NAME=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      - KAFKA_CFG_ALLOW_EVERYONE_IF_NO_ACL_FOUND=false
+      # SSL
+      - KAFKA_CFG_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM=
+      - KAFKA_CERTIFICATE_PASSWORD=supersecret
+      - KAFKA_TLS_TYPE=JKS
+      # SASL
+      - KAFKA_CFG_SASL_ENABLED_MECHANISMS=PLAIN
+      # COMMON SETTINGS
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+      - EXTRA_ARGS=-javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent-0.19.0.jar=9404:/opt/jmx-exporter/kafka-3_0_0.yml
+    volumes:
+      - kafka_1_data:/bitnami/kafka
+      - ./jmx-exporter:/opt/jmx-exporter
+      - ./keystore/kafka-1.server.keystore.jks:/opt/bitnami/kafka/config/certs/kafka.keystore.jks:ro
+      - ./truststore/kafka.truststore.jks:/opt/bitnami/kafka/config/certs/kafka.truststore.jks:ro
+    healthcheck:
+      test: "bash -c 'printf \"\" > /dev/tcp/127.0.0.1/9091; exit $$?;'"
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  kafka-2:
+    container_name: kafka-2
+    hostname: kafka-2
+    image: docker.io/bitnami/kafka:3.7
+    ports:
+      - "29094:29094"
+      - "29097:9404"
+    restart: always
+    networks:
+      - kafka  
+    environment:
+      # KAFKA CLUSTER
+      - KAFKA_CFG_NODE_ID=2
+      - KAFKA_KRAFT_CLUSTER_ID=abcdefghijklmnopqrstuv
+      - KAFKA_CFG_PROCESS_ROLES=broker,controller
+      - KAFKA_CFG_CONTROLLER_QUORUM_VOTERS=0@kafka-0:9093,1@kafka-1:9093,2@kafka-2:9093
+      - KAFKA_CFG_SUPER_USERS=User:sa
+      # LISTENERS
+      - KAFKA_CFG_LISTENERS=INTERNAL://:9091,EXTERNAL://:29094,CONTROLLER://:9093
+      - KAFKA_CFG_ADVERTISED_LISTENERS=INTERNAL://:9091,EXTERNAL://192.168.0.188:29094
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:SASL_SSL,EXTERNAL:SASL_SSL,CONTROLLER:SASL_SSL
+      # BROKER SETTINGS
+      - KAFKA_CFG_INTER_BROKER_LISTENER_NAME=INTERNAL
+      - KAFKA_INTER_BROKER_USER=sa
+      - KAFKA_INTER_BROKER_PASSWORD=000000
+      - KAFKA_CFG_SASL_MECHANISM_INTER_BROKER_PROTOCOL=PLAIN
+      # CONTROLLER SETTINGS
+      - KAFKA_CFG_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_CFG_SASL_MECHANISM_CONTROLLER_PROTOCOL=PLAIN
+      - KAFKA_CONTROLLER_USER=sa
+      - KAFKA_CONTROLLER_PASSWORD=000000
+      # CLIENT SETTINGS
+      - KAFKA_CLIENT_LISTENER_NAME=EXTERNAL
+      - KAFKA_CLIENT_USERS=sa,da,va
+      - KAFKA_CLIENT_PASSWORDS=000000,111111,222222
+      # ACL
+      - KAFKA_CFG_AUTHORIZER_CLASS_NAME=org.apache.kafka.metadata.authorizer.StandardAuthorizer
+      - KAFKA_CFG_ALLOW_EVERYONE_IF_NO_ACL_FOUND=false
+      # SSL
+      - KAFKA_CFG_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM=
+      - KAFKA_CERTIFICATE_PASSWORD=supersecret
+      - KAFKA_TLS_TYPE=JKS
+      # SASL
+      - KAFKA_CFG_SASL_ENABLED_MECHANISMS=PLAIN
+      # COMMON SETTINGS
+      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=false
+      - EXTRA_ARGS=-javaagent:/opt/jmx-exporter/jmx_prometheus_javaagent-0.19.0.jar=9404:/opt/jmx-exporter/kafka-3_0_0.yml
+    volumes:
+      - kafka_2_data:/bitnami/kafka
+      - ./jmx-exporter:/opt/jmx-exporter
+      - ./keystore/kafka-2.server.keystore.jks:/opt/bitnami/kafka/config/certs/kafka.keystore.jks:ro
+      - ./truststore/kafka.truststore.jks:/opt/bitnami/kafka/config/certs/kafka.truststore.jks:ro
+    healthcheck:
+      test: "bash -c 'printf \"\" > /dev/tcp/127.0.0.1/9091; exit $$?;'"
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:v0.7.2
+    ports:
+      - 8080:8080
+    restart: always
+    networks:
+      - kafka  
+    environment:
+      # CLUSTER SETTINGS
+      - KAFKA_CLUSTERS_0_NAME=dev-cluster
+      - KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS=kafka-0:9091,kafka-1:9091,kafka-2:9091
+      - KAFKA_CLUSTERS_0_PROPERTIES_SECURITY_PROTOCOL=SASL_SSL
+      - KAFKA_CLUSTERS_0_PROPERTIES_SASL_MECHANISM=PLAIN
+      - KAFKA_CLUSTERS_0_PROPERTIES_PROTOCOL=SASL
+      - KAFKA_CLUSTERS_0_PROPERTIES_SASL_JAAS_CONFIG=org.apache.kafka.common.security.plain.PlainLoginModule required username="sa" password="000000";
+      - DYNAMIC_CONFIG_ENABLED=true
+      # AUTH
+      - AUTH_TYPE=LOGIN_FORM
+      - SPRING_SECURITY_USER_NAME=admin
+      - SPRING_SECURITY_USER_PASSWORD=admin
+      # TLS
+      - KAFKA_CLUSTERS_0_SSL_TRUSTSTORELOCATION=/kafka.truststore.jks
+      - KAFKA_CLUSTERS_0_SSL_TRUSTSTOREPASSWORD=supersecret
+    volumes:
+      - ./truststore/kafka.truststore.jks:/kafka.truststore.jks:ro
+      # - ./keystore/kafka-0.server.keystore.jks:/kafka.keystore.jks:ro
+    depends_on:
+      - kafka-0
+      - kafka-1
+      - kafka-2
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider localhost:8080 || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  kafka-exporter:
+    container_name: kafka-exporter
+    image: docker.io/bitnami/kafka-exporter:1.7.0
+    hostname: kafka-exporter
+    ports:
+      - 9308:9308
+    restart: always
+    networks:
+      - kafka
+    command: --kafka.server=kafka-0:9091 --kafka.server=kafka-1:9091 --kafka.server=kafka-2:9091 --sasl.enabled --sasl.mechanism=PLAIN --sasl.username=sa --sasl.password=000000 --tls.enabled --tls.insecure-skip-tls-verify --tls.ca-file=/kafka.truststore.jks --log.level=debug
+    volumes:
+      - ./truststore/kafka.truststore.jks:/kafka.truststore.jks:ro
+    depends_on:
+      kafka-0:
+        condition: service_healthy
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+    healthcheck:
+      test: "bash -c 'printf \"\" > /dev/tcp/127.0.0.1/9308; exit $$?;'"
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prom_data:/prometheus
+    networks:
+      - kafka
+    depends_on:
+      - kafka-exporter
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider localhost:9090 || exit 1
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 5s      
+        
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: grafana
+    ports:
+      - 3000:3000
+    environment:
+      # AUTH
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - kafka
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: curl --fail localhost:3000
+      interval: 5s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  kafka_0_data:
+  kafka_1_data:
+  kafka_2_data:
+  prom_data:
+
+networks:
+  kafka:
